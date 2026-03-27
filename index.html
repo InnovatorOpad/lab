@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المختبر — Lab</title>
+<meta name="theme-color" content="#060810">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="المختبر">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- PWA Icons (inline SVG as data URI) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='100' fill='%23060810'/%3E%3Ccircle cx='256' cy='256' r='200' fill='none' stroke='%2300e5ff' stroke-width='6' opacity='.3'/%3E%3Ctext x='256' y='320' font-size='220' text-anchor='middle' fill='white'%3E%F0%9F%94%AC%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22%D8%A7%D9%84%D9%85%D8%AE%D8%AA%D8%A8%D8%B1%22%2C%22short_name%22%3A%22Lab%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23060810%22%2C%22theme_color%22%3A%22%23060810%22%2C%22orientation%22%3A%22portrait%22%7D">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#060810; --surface:#0d1117; --surface2:#161b27;
+    --cyan:#00e5ff; --gold:#F5C518; --green:#39ff7a; --red:#ff4d6d; --purple:#b97fff;
+    --text:#e8eaf0; --text-muted:#5a6070; --border:rgba(255,255,255,0.06);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Tajawal',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;top:-200px;right:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(0,229,255,0.04),transparent 70%);pointer-events:none;z-index:0;}
+  body::after{content:'';position:fixed;bottom:-200px;left:-200px;width:600px;height:600px;background:radial-gradient(circle,rgba(245,197,24,0.03),transparent 70%);pointer-events:none;z-index:0;}
+  .noise{position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.4;}
+  .container{max-width:1100px;margin:0 auto;padding:0 24px;position:relative;z-index:1;}
+
+header{padding:32px 0 24px;border-bottom:1px solid var(–border);margin-bottom:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;}
+.lab-brand{display:flex;align-items:center;gap:14px;}
+.lab-icon{width:48px;height:48px;border:1px solid var(–cyan);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;animation:pulse-border 3s ease-in-out infinite;}
+@keyframes pulse-border{0%,100%{box-shadow:0 0 15px rgba(0,229,255,0.15)}50%{box-shadow:0 0 30px rgba(0,229,255,0.3)}}
+.lab-title h1{font-size:22px;font-weight:700;}
+.lab-title span{font-family:‘Space Mono’,monospace;font-size:11px;color:var(–cyan);opacity:.6;display:block;margin-top:2px;}
+.header-meta{display:flex;align-items:center;gap:8px;}
+.live-dot{width:8px;height:8px;background:var(–green);border-radius:50%;animation:blink 2s ease-in-out infinite;box-shadow:0 0 8px var(–green);}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.live-text{font-family:‘Space Mono’,monospace;font-size:10px;color:var(–green);opacity:.8;}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:32px;}
+.stat-card{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:16px;text-align:center;}
+.stat-value{font-family:‘Space Mono’,monospace;font-size:28px;font-weight:700;line-height:1;margin-bottom:6px;}
+.stat-label{font-size:12px;color:var(–text-muted);}
+
+.section-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.section-label{font-family:‘Space Mono’,monospace;font-size:10px;color:var(–text-muted);text-transform:uppercase;letter-spacing:2px;white-space:nowrap;}
+.section-line{flex:1;height:1px;background:var(–border);}
+
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-bottom:16px;}
+.project-card{background:var(–surface);border:1px solid var(–border);border-radius:16px;padding:20px;position:relative;transition:all .25s;cursor:default;}
+.project-card:hover{transform:translateY(-3px);}
+.project-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;}
+.project-emoji{font-size:28px;line-height:1;}
+.project-right{display:flex;align-items:center;gap:6px;}
+.project-actions{display:flex;gap:5px;opacity:0;transition:opacity .2s;}
+.project-card:hover .project-actions{opacity:1;}
+.proj-btn{background:var(–surface2);border:1px solid var(–border);border-radius:7px;width:27px;height:27px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .15s;color:var(–text-muted);}
+.proj-btn:hover{border-color:var(–cyan);color:var(–cyan);}
+.proj-btn.del:hover{border-color:var(–red);color:var(–red);}
+.project-status{font-family:‘Space Mono’,monospace;font-size:9px;padding:3px 8px;border-radius:20px;border:1px solid;white-space:nowrap;}
+.project-name{font-size:18px;font-weight:700;margin-bottom:4px;}
+.project-sub{font-family:‘Space Mono’,monospace;font-size:11px;opacity:.4;margin-bottom:10px;}
+.project-desc{font-size:13px;color:var(–text-muted);line-height:1.6;}
+.project-note{margin-top:12px;padding:10px;border-radius:8px;font-size:11px;color:#8a90a0;line-height:1.6;}
+.project-note-label{font-family:‘Space Mono’,monospace;font-size:9px;margin-bottom:4px;}
+.project-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.tag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(–surface2);color:var(–text-muted);border:1px solid var(–border);}
+
+.add-project-btn{width:100%;padding:16px;background:transparent;border:1.5px dashed rgba(255,255,255,0.1);border-radius:16px;color:var(–text-muted);font-family:‘Tajawal’,sans-serif;font-size:14px;cursor:pointer;transition:all .2s;margin-bottom:32px;}
+.add-project-btn:hover{border-color:rgba(0,229,255,0.3);color:var(–cyan);}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px;}
+.panel{background:var(–surface);border:1px solid var(–border);border-radius:16px;padding:20px;}
+.panel-title{font-size:15px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+.idea-input-wrap{display:flex;gap:8px;margin-bottom:14px;}
+.idea-input{flex:1;background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:10px 14px;color:var(–text);font-family:‘Tajawal’,sans-serif;font-size:14px;outline:none;transition:border-color .2s;direction:rtl;}
+.idea-input:focus{border-color:rgba(0,229,255,0.3);}
+.idea-input::placeholder{color:var(–text-muted);}
+.idea-add-btn{background:var(–cyan);border:none;border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:18px;color:var(–bg);font-weight:700;transition:all .2s;flex-shrink:0;}
+.idea-add-btn:hover{background:#33ecff;transform:scale(1.05);}
+.ideas-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;}
+.ideas-list::-webkit-scrollbar{width:4px;}
+.ideas-list::-webkit-scrollbar-thumb{background:var(–border);border-radius:4px;}
+.idea-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;background:var(–surface2);border-radius:10px;border:1px solid var(–border);animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.idea-dot{width:6px;height:6px;border-radius:50%;background:var(–cyan);margin-top:6px;flex-shrink:0;}
+.idea-text{font-size:13px;flex:1;line-height:1.5;}
+.idea-delete{background:none;border:none;cursor:pointer;color:var(–text-muted);font-size:14px;opacity:0;transition:all .2s;flex-shrink:0;}
+.idea-item:hover .idea-delete{opacity:1;}
+.idea-delete:hover{color:var(–red);}
+
+.log-area{background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:12px 14px;min-height:180px;color:var(–text);font-family:‘Tajawal’,sans-serif;font-size:13px;line-height:1.7;resize:none;outline:none;width:100%;direction:rtl;transition:border-color .2s;}
+.log-area:focus{border-color:rgba(245,197,24,0.3);}
+.log-area::placeholder{color:var(–text-muted);}
+
+.exp-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(–border);}
+.exp-item:last-child{border-bottom:none;}
+.exp-checkbox{width:18px;height:18px;border:1.5px solid var(–text-muted);border-radius:5px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:all .2s;flex-shrink:0;}
+.exp-checkbox.done{border-color:var(–green);background:rgba(57,255,122,0.15);color:var(–green);}
+.exp-label{font-size:13px;flex:1;}
+.exp-label.done-text{text-decoration:line-through;color:var(–text-muted);}
+.exp-category{font-family:‘Space Mono’,monospace;font-size:9px;color:var(–text-muted);border:1px solid var(–border);padding:2px 6px;border-radius:4px;}
+.exp-del-btn{background:none;border:none;cursor:pointer;color:var(–text-muted);font-size:12px;opacity:0;transition:opacity .2s;}
+.exp-item:hover .exp-del-btn{opacity:1;}
+.exp-del-btn:hover{color:var(–red);}
+.exp-add-wrap{display:flex;gap:8px;margin-top:14px;}
+.exp-add-input{flex:1;background:var(–surface2);border:1px solid var(–border);border-radius:8px;padding:8px 12px;color:var(–text);font-family:‘Tajawal’,sans-serif;font-size:13px;outline:none;direction:rtl;}
+.exp-add-input:focus{border-color:rgba(57,255,122,0.3);}
+.exp-add-input::placeholder{color:var(–text-muted);}
+.exp-cat-input{width:80px;background:var(–surface2);border:1px solid var(–border);border-radius:8px;padding:8px 8px;color:var(–text);font-family:‘Space Mono’,monospace;font-size:11px;outline:none;direction:ltr;}
+.exp-add-btn2{background:var(–green);border:none;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;color:var(–bg);font-weight:700;flex-shrink:0;transition:all .2s;}
+.exp-add-btn2:hover{background:#5fffa0;}
+
+/* Modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(5px);animation:fadeIn .2s ease;}
+.modal{background:var(–surface);border:1px solid rgba(0,229,255,0.18);border-radius:20px;padding:28px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;}
+.modal h3{font-size:18px;font-weight:700;margin-bottom:20px;color:var(–cyan);}
+.modal-field{margin-bottom:14px;}
+.modal-field label{font-size:11px;color:var(–text-muted);display:block;margin-bottom:6px;font-family:‘Space Mono’,monospace;text-transform:uppercase;letter-spacing:1px;}
+.modal-input,.modal-textarea,.modal-select,.modal-tags,.modal-note{width:100%;background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:10px 14px;color:var(–text);font-family:‘Tajawal’,sans-serif;font-size:14px;outline:none;direction:rtl;transition:border-color .2s;}
+.modal-input:focus,.modal-textarea:focus,.modal-select:focus,.modal-tags:focus,.modal-note:focus{border-color:rgba(0,229,255,0.35);}
+.modal-textarea{min-height:80px;resize:vertical;}
+.modal-select{cursor:pointer;}
+.modal-select option{background:var(–surface2);}
+.modal-tags{font-family:‘Space Mono’,monospace;font-size:12px;direction:ltr;}
+.modal-note{font-size:13px;min-height:60px;resize:vertical;}
+.emoji-row{display:flex;align-items:center;gap:12px;}
+.emoji-row .modal-input{width:70px;text-align:center;font-size:22px;padding:8px;}
+.modal-actions{display:flex;gap:10px;margin-top:22px;}
+.btn-save{background:var(–cyan);color:var(–bg);border:none;border-radius:10px;padding:10px 28px;font-family:‘Tajawal’,sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;}
+.btn-save:hover{background:#33ecff;}
+.btn-cancel{background:var(–surface2);color:var(–text-muted);border:1px solid var(–border);border-radius:10px;padding:10px 20px;font-family:‘Tajawal’,sans-serif;font-size:15px;cursor:pointer;transition:all .2s;}
+.btn-cancel:hover{color:var(–text);}
+
+footer{padding:24px 0;border-top:1px solid var(–border);margin-top:16px;display:flex;align-items:center;justify-content:space-between;}
+.footer-text{font-family:‘Space Mono’,monospace;font-size:10px;color:var(–text-muted);}
+.footer-version{font-family:‘Space Mono’,monospace;font-size:10px;color:var(–cyan);opacity:.5;}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:var(–bg);}
+::-webkit-scrollbar-thumb{background:var(–surface2);border-radius:4px;}
+@media(max-width:640px){.stats-row{grid-template-columns:repeat(2,1fr)}.two-col{grid-template-columns:1fr}.projects-grid{grid-template-columns:1fr}}
+</style>
+
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <header>
+    <div class="lab-brand">
+      <div class="lab-icon">🔬</div>
+      <div class="lab-title">
+        <h1>مختبر الابتكار</h1>
+        <span>INNOVATION LAB — PRIVATE</span>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="live-dot"></div>
+      <span class="live-text" id="clock">--:--</span>
+      <button onclick="showInstallGuide()" style="margin-right:10px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.25);border-radius:8px;padding:5px 12px;color:var(--cyan);font-family:'Space Mono',monospace;font-size:10px;cursor:pointer;transition:all .2s;">⬇ INSTALL</button>
+    </div>
+  </header>
+
+  <!-- Install Guide -->
+
+  <div id="install-guide" style="display:none;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);border-radius:14px;padding:18px 20px;margin-bottom:24px;position:relative;animation:fadeIn .3s ease;">
+    <button onclick="document.getElementById('install-guide').style.display='none'" style="position:absolute;top:12px;left:16px;background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;">✕</button>
+    <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--cyan);margin-bottom:14px;letter-spacing:1px;">⬇ INSTALL ON DEVICE</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+      <div style="font-size:13px;color:var(--text-muted);line-height:2;">
+        <div style="color:var(--text);margin-bottom:4px;">📱 iPhone / iPad</div>
+        1. افتح الملف في <strong style="color:var(--text)">Safari</strong><br>
+        2. اضغط زر المشاركة <strong style="color:var(--text)">↑</strong><br>
+        3. اختر <strong style="color:var(--cyan)">"إضافة إلى الشاشة الرئيسية"</strong>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:2;">
+        <div style="color:var(--text);margin-bottom:4px;">🖥 Desktop (Chrome/Edge)</div>
+        1. افتح الملف في المتصفح<br>
+        2. اضغط أيقونة <strong style="color:var(--text)">⊕</strong> في شريط العنوان<br>
+        3. أو القائمة ← <strong style="color:var(--cyan)">"Install App"</strong>
+      </div>
+      <div style="font-size:13px;color:var(--text-muted);line-height:2;">
+        <div style="color:var(--text);margin-bottom:4px;">📱 Android (Chrome)</div>
+        1. افتح الملف في <strong style="color:var(--text)">Chrome</strong><br>
+        2. القائمة ⋮ ←<br>
+        3. اختر <strong style="color:var(--cyan)">"إضافة إلى الشاشة الرئيسية"</strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-value" style="color:var(--cyan)" id="stat-projects">0</div><div class="stat-label">مشاريع</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--gold)" id="stat-ideas">0</div><div class="stat-label">أفكار</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--green)" id="stat-exps">0</div><div class="stat-label">تجارب مكتملة</div></div>
+    <div class="stat-card"><div class="stat-value" style="color:var(--red)" id="stat-days">1</div><div class="stat-label">يوم في المختبر</div></div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-label">PROJECTS</span>
+    <div class="section-line"></div>
+    <span class="section-label">المشاريع</span>
+  </div>
+  <div class="projects-grid" id="projects-grid"></div>
+  <button class="add-project-btn" onclick="openModal()">+ أضف مشروعاً جديداً</button>
+
+  <div class="two-col">
+    <div class="panel">
+      <div class="panel-title">💡 <span>أفكار جديدة</span></div>
+      <div class="idea-input-wrap">
+        <input class="idea-input" id="idea-input" type="text" placeholder="اكتب فكرة وأضفها..."/>
+        <button class="idea-add-btn" onclick="addIdea()">+</button>
+      </div>
+      <div class="ideas-list" id="ideas-list"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-title">📋 <span>يوميات المختبر</span></div>
+      <textarea class="log-area" id="lab-log" placeholder="اكتب ملاحظاتك، أفكارك، ومشاعرك اليوم...&#10;&#10;المختبر مكانك الخاص — لا أحد يراه."></textarea>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <span class="section-label">EXPERIMENTS</span>
+    <div class="section-line"></div>
+    <span class="section-label">التجارب والتعلم</span>
+  </div>
+  <div class="panel" style="margin-bottom:32px;">
+    <div id="experiments-list"></div>
+    <div class="exp-add-wrap">
+      <input class="exp-add-input" id="exp-input" type="text" placeholder="أضف تجربة أو مهمة..."/>
+      <input class="exp-cat-input" id="exp-cat" type="text" placeholder="TAG"/>
+      <button class="exp-add-btn2" onclick="addExp()">+</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-text">المختبر — خاص ومشفّر 🔒</span>
+    <span class="footer-version">LAB v2.0 — INNOVATOR</span>
+  </footer>
+</div>
+
+<!-- Modal -->
+
+<div class="modal-overlay" id="modal" style="display:none" onclick="closeBg(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3 id="modal-title">مشروع جديد</h3>
+    <div class="modal-field"><label>الاسم</label><input class="modal-input" id="m-name" placeholder="مدار، سياج..."/></div>
+    <div class="modal-field"><label>الاسم الفرعي (اختياري)</label><input class="modal-input" id="m-sub" placeholder="MADAR / SIYAJ"/></div>
+    <div class="modal-field"><label>الإيموجي</label><div class="emoji-row"><input class="modal-input" id="m-emoji" placeholder="🔬"/></div></div>
+    <div class="modal-field"><label>الوصف</label><textarea class="modal-textarea" id="m-desc" placeholder="ما هو هذا المشروع؟"></textarea></div>
+    <div class="modal-field"><label>الحالة</label>
+      <select class="modal-select" id="m-status">
+        <option value="building">BUILDING</option>
+        <option value="active">ACTIVE IDEA</option>
+        <option value="paused">PAUSED</option>
+        <option value="done">DONE</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>اللون</label>
+      <select class="modal-select" id="m-color">
+        <option value="cyan">سماوي</option>
+        <option value="gold">ذهبي</option>
+        <option value="green">أخضر</option>
+        <option value="red">أحمر</option>
+        <option value="purple">بنفسجي</option>
+      </select>
+    </div>
+    <div class="modal-field"><label>التقنيات (افصل بفاصلة)</label><input class="modal-tags" id="m-tags" placeholder="FlutterFlow, Supabase, Anthropic API"/></div>
+    <div class="modal-field"><label>ملاحظة المؤسس (اختياري)</label><textarea class="modal-note" id="m-note" placeholder="تذكير، تحدٍّ، أو فكرة خاصة..."></textarea></div>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="saveProject()">حفظ</button>
+      <button class="btn-cancel" onclick="closeModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const C = {
+  cyan:   {dim:'rgba(0,229,255,0.15)',  bright:'rgba(0,229,255,0.4)',  glow:'rgba(0,229,255,0.1)',  st:'color:#00e5ff;border-color:rgba(0,229,255,0.3);background:rgba(0,229,255,0.08)'},
+  gold:   {dim:'rgba(245,197,24,0.15)', bright:'rgba(245,197,24,0.4)', glow:'rgba(245,197,24,0.1)', st:'color:#F5C518;border-color:rgba(245,197,24,0.3);background:rgba(245,197,24,0.08)'},
+  green:  {dim:'rgba(57,255,122,0.15)', bright:'rgba(57,255,122,0.4)', glow:'rgba(57,255,122,0.1)', st:'color:#39ff7a;border-color:rgba(57,255,122,0.3);background:rgba(57,255,122,0.08)'},
+  red:    {dim:'rgba(255,77,109,0.15)', bright:'rgba(255,77,109,0.4)', glow:'rgba(255,77,109,0.1)', st:'color:#ff4d6d;border-color:rgba(255,77,109,0.3);background:rgba(255,77,109,0.08)'},
+  purple: {dim:'rgba(185,127,255,0.15)',bright:'rgba(185,127,255,0.4)',glow:'rgba(185,127,255,0.1)',st:'color:#b97fff;border-color:rgba(185,127,255,0.3);background:rgba(185,127,255,0.08)'},
+};
+const SL = {building:'BUILDING',active:'ACTIVE IDEA',paused:'PAUSED',done:'DONE ✓'};
+
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}}
+function sv(k,v){localStorage.setItem(k,JSON.stringify(v))}
+
+function showInstallGuide(){
+  const g=document.getElementById('install-guide');
+  g.style.display=g.style.display==='none'?'block':'none';
+}
+
+// Clock
+function updateClock(){const n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+updateClock();setInterval(updateClock,10000);
+
+// Days
+if(!localStorage.getItem('lab-start'))localStorage.setItem('lab-start',Date.now());
+document.getElementById('stat-days').textContent=Math.max(1,Math.floor((Date.now()-Number(localStorage.getItem('lab-start')))/86400000));
+
+// ── PROJECTS ──────────────────────────────────────────────────────────────
+const DP=[
+  {id:1,name:'مدار',sub:'MADAR',emoji:'🌌',desc:'منصة تحليل الذكاء الاصطناعي باللغة العربية — تحليل لا نقل',status:'building',color:'cyan',tags:'HTML/CSS/JS,AI Analysis,Arabic',note:''},
+  {id:2,name:'Yellow Recorder',sub:'YR — PHASE 3',emoji:'🎙️',desc:'تطبيق تسجيل صوتي بهوية ذهبية/سوداء مع FlutterFlow وSupabase',status:'paused',color:'gold',tags:'FlutterFlow,Supabase,#F5C518',note:''},
+  {id:3,name:'Crew',sub:'CREW HSE',emoji:'🏗️',desc:'نظام تصاريح العمل الرقمي لقطاع الإنشاءات بالخليج',status:'active',color:'green',tags:'React.js,Flask,Gulf',note:''},
+  {id:4,name:'سياج',sub:'SIYAJ — FAMILY SHIELD',emoji:'🛡️',desc:'تطبيق يكشف الاحتيال في الرسائل قبل وقوع الضرر — مصمم لكبار السن والأطفال، يثبته الابن على هاتف أهله',status:'active',color:'red',tags:'FlutterFlow,Anthropic API,Supabase,خليج',note:'النسخة الأولى = شاشة واحدة + prompt ذكي. الهدف: نسخة تعمل خلال أسبوعين — وإلا الفكرة ليست المشكلة.'},
+];
+
+let projects=ld('lab-projects-v2',null);
+if(!projects){projects=DP;sv('lab-projects-v2',projects);}
+let editId=null;
+
+function renderProjects(){
+  const g=document.getElementById('projects-grid');
+  g.innerHTML='';
+  projects.forEach(p=>{
+    const c=C[p.color]||C.cyan;
+    const tags=(p.tags||'').split(',').filter(Boolean).map(t=>`<span class="tag">${t.trim()}</span>`).join('');
+    const note=p.note?`<div class="project-note" style="background:${c.dim.replace('0.15','0.06')};border:1px solid ${c.dim}"><div class="project-note-label" style="${c.st.split(';')[0]}">FOUNDER NOTE</div>${p.note}</div>`:'';
+    const card=document.createElement('div');
+    card.className='project-card';
+    card.style.borderColor=c.dim;
+    card.onmouseenter=()=>{card.style.borderColor=c.bright;card.style.boxShadow=`0 8px 32px ${c.glow}`;};
+    card.onmouseleave=()=>{card.style.borderColor=c.dim;card.style.boxShadow='';};
+    card.innerHTML=`
+      <div class="project-top">
+        <div class="project-emoji">${p.emoji||'🔬'}</div>
+        <div class="project-right">
+          <span class="project-status" style="${c.st}">${SL[p.status]||p.status}</span>
+          <div class="project-actions">
+            <button class="proj-btn" onclick="editProject(${p.id})">✏️</button>
+            <button class="proj-btn del" onclick="delProject(${p.id})">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="project-name">${p.name}</div>
+      ${p.sub?`<div class="project-sub">${p.sub}</div>`:''}
+      <div class="project-desc">${p.desc}</div>
+      ${note}
+      ${tags?`<div class="project-tags">${tags}</div>`:''}
+    `;
+    g.appendChild(card);
+  });
+  document.getElementById('stat-projects').textContent=projects.length;
+}
+
+function delProject(id){
+  if(!confirm('حذف هذا المشروع؟'))return;
+  projects=projects.filter(p=>p.id!==id);
+  sv('lab-projects-v2',projects);renderProjects();
+}
+
+function editProject(id){
+  const p=projects.find(x=>x.id===id);if(!p)return;
+  editId=id;
+  document.getElementById('modal-title').textContent='تعديل المشروع';
+  document.getElementById('m-name').value=p.name;
+  document.getElementById('m-sub').value=p.sub||'';
+  document.getElementById('m-emoji').value=p.emoji||'';
+  document.getElementById('m-desc').value=p.desc;
+  document.getElementById('m-status').value=p.status;
+  document.getElementById('m-color').value=p.color;
+  document.getElementById('m-tags').value=p.tags||'';
+  document.getElementById('m-note').value=p.note||'';
+  document.getElementById('modal').style.display='flex';
+}
+
+function openModal(){
+  editId=null;
+  document.getElementById('modal-title').textContent='مشروع جديد';
+  ['m-name','m-sub','m-desc','m-tags','m-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('m-emoji').value='🔬';
+  document.getElementById('m-status').value='building';
+  document.getElementById('m-color').value='cyan';
+  document.getElementById('modal').style.display='flex';
+  setTimeout(()=>document.getElementById('m-name').focus(),100);
+}
+
+function closeModal(){document.getElementById('modal').style.display='none';}
+function closeBg(e){if(e.target.id==='modal')closeModal();}
+
+function saveProject(){
+  const name=document.getElementById('m-name').value.trim();
+  if(!name){document.getElementById('m-name').focus();return;}
+  const d={name,sub:document.getElementById('m-sub').value.trim(),emoji:document.getElementById('m-emoji').value.trim()||'🔬',desc:document.getElementById('m-desc').value.trim(),status:document.getElementById('m-status').value,color:document.getElementById('m-color').value,tags:document.getElementById('m-tags').value.trim(),note:document.getElementById('m-note').value.trim()};
+  if(editId){const i=projects.findIndex(p=>p.id===editId);if(i!==-1)projects[i]={...projects[i],...d};}
+  else{d.id=Date.now();projects.push(d);}
+  sv('lab-projects-v2',projects);renderProjects();closeModal();
+}
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+// ── IDEAS ─────────────────────────────────────────────────────────────────
+let ideas=ld('lab-ideas',[]);
+function renderIdeas(){
+  document.getElementById('ideas-list').innerHTML=ideas.map((idea,i)=>
+    `<div class="idea-item"><div class="idea-dot"></div><div class="idea-text">${idea}</div><button class="idea-delete" onclick="delIdea(${i})">✕</button></div>`
+  ).join('');
+  document.getElementById('stat-ideas').textContent=ideas.length;
+}
+function addIdea(){const input=document.getElementById('idea-input');const v=input.value.trim();if(!v)return;ideas.unshift(v);sv('lab-ideas',ideas);renderIdeas();input.value='';input.focus();}
+function delIdea(i){ideas.splice(i,1);sv('lab-ideas',ideas);renderIdeas();}
+document.getElementById('idea-input').addEventListener('keydown',e=>{if(e.key==='Enter')addIdea();});
+renderIdeas();
+
+// ── LOG ───────────────────────────────────────────────────────────────────
+const logEl=document.getElementById('lab-log');
+logEl.value=localStorage.getItem('lab-log')||'';
+logEl.addEventListener('input',()=>localStorage.setItem('lab-log',logEl.value));
+
+// ── EXPERIMENTS ───────────────────────────────────────────────────────────
+const DE=[
+  {text:'كتابة أول مقال تحليلي لمدار',cat:'MADAR',done:false},
+  {text:'نشر الموقع على GitHub Pages',cat:'MADAR',done:false},
+  {text:'إعادة تفعيل Supabase (yellow-recorder)',cat:'YR',done:false},
+  {text:'إكمال HTML/CSS على freeCodeCamp',cat:'LEARN',done:false},
+  {text:'تشغيل أول script بـ Python API',cat:'LEARN',done:false},
+];
+let exps=ld('lab-exps-v2',null);
+if(!exps){exps=DE;sv('lab-exps-v2',exps);}
+
+function renderExps(){
+  document.getElementById('experiments-list').innerHTML=exps.map((e,i)=>
+    `<div class="exp-item">
+      <div class="exp-checkbox ${e.done?'done':''}" onclick="toggleExp(${i})">${e.done?'✓':''}</div>
+      <div class="exp-label ${e.done?'done-text':''}">${e.text}</div>
+      <span class="exp-category">${e.cat||''}</span>
+      <button class="exp-del-btn" onclick="delExp(${i})">✕</button>
+    </div>`
+  ).join('');
+  document.getElementById('stat-exps').textContent=exps.filter(e=>e.done).length;
+}
+function toggleExp(i){exps[i].done=!exps[i].done;sv('lab-exps-v2',exps);renderExps();}
+function delExp(i){exps.splice(i,1);sv('lab-exps-v2',exps);renderExps();}
+function addExp(){
+  const text=document.getElementById('exp-input').value.trim();if(!text)return;
+  const cat=document.getElementById('exp-cat').value.trim().toUpperCase()||'LAB';
+  exps.push({text,cat,done:false});sv('lab-exps-v2',exps);renderExps();
+  document.getElementById('exp-input').value='';document.getElementById('exp-cat').value='';
+}
+document.getElementById('exp-input').addEventListener('keydown',e=>{if(e.key==='Enter')addExp();});
+renderExps();
+
+renderProjects();
+</script>
+
+</body>
+</html>
